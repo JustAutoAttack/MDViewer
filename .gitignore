@@ -1,0 +1,25 @@
+# Rust (Cargo)
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# Node.js
+/node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Tauri
+src-tauri/target/
+src-tauri/gen/
+src-tauri/icons/
+src-tauri/.env
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
