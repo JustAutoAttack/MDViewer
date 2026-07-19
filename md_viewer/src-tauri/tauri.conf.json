@@ -30,6 +30,16 @@
 			"icons/128x128@2x.png",
 			"icons/icon.icns",
 			"icons/icon.ico"
+		],
+		"resources": ["md-viewer.desktop"],
+		"fileAssociations": [
+			{
+				"ext": ["md", "markdown"],
+				"name": "Markdown File",
+				"description": "Markdown Viewer",
+				"mimeType": "text/markdown",
+				"role": "Editor"
+			}
 		]
 	}
 }

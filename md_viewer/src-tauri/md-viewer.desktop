@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=md-viewer
+Comment=Markdown Viewer
+Exec=md-viewer %f
+Icon=md-viewer
+Terminal=false
+Categories=Utility;TextEditor;
+MimeType=text/markdown;text/plain;
+StartupNotify=true

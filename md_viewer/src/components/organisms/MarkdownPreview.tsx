@@ -5,7 +5,7 @@ interface MarkdownPreviewProps {
 	rawContent: string;
 }
 
-const DEBOUNCE_MS = 150;
+const DEBOUNCE_MS = 100;
 
 export const MarkdownPreview = ({ rawContent }: MarkdownPreviewProps) => {
 	const [html, setHtml] = useState<string>('');

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { open } from '@tauri-apps/plugin-dialog';
 import { getVersion } from '@tauri-apps/api/app';
+import { invoke } from '@tauri-apps/api/core';
+
 import { EditorView } from '../../types';
 import { useWorkspace } from '../../hooks/useWorkspace';
 import { Navbar } from './Navbar';
@@ -31,6 +33,28 @@ export const MainLayout = () => {
 		reorderFiles
 	} = useWorkspace(autosave);
 
+	const handleOpenFile = async () => {
+		const selected = await open({
+			multiple: false,
+			filters: [{ name: 'Markdown', extensions: ['md', 'markdown'] }]
+		});
+		if (!selected) return;
+		const path = Array.isArray(selected) ? selected[0] : selected;
+		await openFileFromDisk(path);
+	};
+
+	useEffect(() => {
+		invoke<string | null>('startup_file').then(async (path) => {
+			console.log('startup_file:', path);
+
+			if (path) {
+				await openFileFromDisk(path);
+				console.log('opened:', path);
+			}
+		});
+	}, [openFileFromDisk]);
+
+	// Version Context
 	useEffect(() => {
 		getVersion()
 			.then(setVersion)
@@ -47,16 +71,6 @@ export const MainLayout = () => {
 		window.addEventListener('keydown', handleKeyDown);
 		return () => window.removeEventListener('keydown', handleKeyDown);
 	}, [activeId, saveFile]);
-
-	const handleOpenFile = async () => {
-		const selected = await open({
-			multiple: false,
-			filters: [{ name: 'Markdown', extensions: ['md', 'markdown'] }]
-		});
-		if (!selected) return;
-		const path = Array.isArray(selected) ? selected[0] : selected;
-		await openFileFromDisk(path);
-	};
 
 	return (
 		<div className='flex flex-col h-screen w-full bg-bg text-text'>

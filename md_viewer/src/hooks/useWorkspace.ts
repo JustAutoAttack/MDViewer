@@ -8,6 +8,7 @@ import {
 	watch
 } from '@tauri-apps/plugin-fs';
 import { dirname, join, basename } from '@tauri-apps/api/path';
+import { listen } from '@tauri-apps/api/event';
 import { OpenFile } from '../types';
 
 const stripExt = (name: string): string => {
@@ -54,15 +55,15 @@ export function useWorkspace(autosave: boolean) {
 	const activeFile: OpenFile =
 		files.find((f: OpenFile) => f.id === activeId) ?? files[0];
 
-    const reorderFiles = (fromIndex: number, toIndex: number) => {
-        setFiles((prev) => {
-            const newFiles = [...prev];
-            const [removed] = newFiles.splice(fromIndex, 1);
-            newFiles.splice(toIndex, 0, removed);
-            return newFiles;
-        });
-    };
-    
+	const reorderFiles = (fromIndex: number, toIndex: number) => {
+		setFiles((prev) => {
+			const newFiles = [...prev];
+			const [removed] = newFiles.splice(fromIndex, 1);
+			newFiles.splice(toIndex, 0, removed);
+			return newFiles;
+		});
+	};
+
 	const updateFile = useCallback(
 		(id: string, patch: Partial<OpenFile>): void => {
 			setFiles((prev: OpenFile[]) => {
@@ -120,28 +121,29 @@ export function useWorkspace(autosave: boolean) {
 		[activeId, updateFile, writeToDisk]
 	);
 
-	const openFileFromDisk = useCallback(
-		async (path: string): Promise<void> => {
-			try {
-				const content: string = await readTextFile(path);
-				const name: string = await basename(path);
-				const file: OpenFile = {
-					id: crypto.randomUUID(),
-					path: path,
-					baseName: stripExt(name),
-					content: content,
-					status: 'synced'
-				};
-				setFiles((prev: OpenFile[]) => {
-					return [...prev, file];
-				});
-				setActiveId(file.id);
-			} catch (err: unknown) {
-				console.error('Failed to open file:', err);
-			}
-		},
-		[]
-	);
+	const openFileFromDisk = useCallback(async (path: string) => {
+		console.log('opening', path);
+
+		try {
+			const content = await readTextFile(path);
+			console.log('content length', content.length);
+
+			const name = await basename(path);
+
+			const file: OpenFile = {
+				id: crypto.randomUUID(),
+				path,
+				baseName: stripExt(name),
+				content,
+				status: 'synced'
+			};
+
+			setFiles((prev) => [...prev, file]);
+			setActiveId(file.id);
+		} catch (err) {
+			console.error(err);
+		}
+	}, []);
 
 	const newFile = useCallback((): void => {
 		setFiles((prev: OpenFile[]) => {
@@ -357,6 +359,26 @@ export function useWorkspace(autosave: boolean) {
 	useEffect(() => {
 		autosaveRef.current = autosave;
 	}, [autosave]);
+
+	// Open With
+	useEffect(() => {
+		let unlisten: () => void;
+
+		const setupListener = async () => {
+			unlisten = await listen<string>('open-file-path', (event) => {
+				const path = event.payload;
+				if (path) {
+					openFileFromDisk(path);
+				}
+			});
+		};
+
+		setupListener();
+
+		return () => {
+			if (unlisten) unlisten();
+		};
+	}, [openFileFromDisk]);
 
 	return {
 		files,
