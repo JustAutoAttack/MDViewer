@@ -1,0 +1,77 @@
+@import 'tailwindcss';
+@import '@fontsource/ibm-plex-sans/400.css';
+@import '@fontsource/ibm-plex-sans/500.css';
+@import '@fontsource/ibm-plex-sans/600.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+@plugin "@tailwindcss/typography";
+
+@theme {
+	/* Runtime-overridable tokens — defaults are "Phosphor Dark" */
+	--color-bg-primary: #14161a;
+	--color-bg-secondary: #1c1f24;
+	--color-bg-hover: #262a30;
+	--color-text-primary: #edeae3;
+	--color-text-secondary: #8d939b;
+	--color-accent-primary: #ffae42;
+	--color-accent-hover: #ffc670;
+	--color-border: #2c3036;
+
+	/* Map to utility classes */
+	--color-bg: var(--color-bg-primary);
+	--color-bg-secondary: var(--color-bg-secondary);
+	--color-bg-hover: var(--color-bg-hover);
+	--color-text: var(--color-text-primary);
+	--color-text-secondary: var(--color-text-secondary);
+	--color-accent: var(--color-accent-primary);
+	--color-accent-hover: var(--color-accent-hover);
+	--color-border: var(--color-border);
+
+	--font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+	--font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+@layer base {
+	body {
+		background-color: var(--color-bg);
+		color: var(--color-text);
+		font-family: var(--font-sans);
+	}
+}
+
+.markdown-body {
+	@apply prose prose-invert max-w-none;
+	font-family: var(--font-sans);
+}
+
+.markdown-body code,
+.markdown-body pre {
+	font-family: var(--font-mono);
+}
+
+/* Signature: blinking caret beside the wordmark */
+@keyframes caret-blink {
+	0%,
+	49% {
+		opacity: 1;
+	}
+	50%,
+	100% {
+		opacity: 0;
+	}
+}
+
+.caret {
+	display: inline-block;
+	width: 2px;
+	height: 1em;
+	background-color: var(--color-accent);
+	animation: caret-blink 1s step-end infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.caret {
+		animation: none;
+		opacity: 1;
+	}
+}
