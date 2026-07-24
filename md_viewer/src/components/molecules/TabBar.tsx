@@ -1,4 +1,5 @@
 import { Plus, X } from 'lucide-react';
+
 import { OpenFile } from '../../types';
 
 interface TabBarProps {
